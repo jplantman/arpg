@@ -1,8 +1,8 @@
-var setupCharacterClass = function(){
+var setupCharacterClass = function(camera){
 
     class Character extends Sprite {
         constructor(imgData, x, y){
-            super (imgData, x, y, 0, 10, 30);
+            super (imgData, x, y, {dx:16, dy:24, w:32, h:40});
 
             this.frame = [0, 10];
 
@@ -30,6 +30,17 @@ var setupCharacterClass = function(){
             this.movementSpeed = 80;
             this.movingTo = undefined;
 
+        }
+
+        draw(){
+            super.draw();
+
+            // show the hitbox, for debugging!
+            var hitbox = this.hitbox();
+            ctx.fillStyle = 'red';
+            ctx.globalAlpha = 0.3;
+            ctx.fillRect(hitbox.x - camera.x+camera.width/2, hitbox.y - camera.y+camera.height/2, hitbox.w, hitbox.h);
+            ctx.globalAlpha = 1;
         }
 
         stopMoving(){

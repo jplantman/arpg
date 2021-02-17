@@ -1,4 +1,19 @@
+/*****  Three Main Functions: **********
 
+  preload.js
+  create (in this file, index.html)
+  gameLoop.js
+
+
+  **** Family Tree ****
+
+        Sprite
+          v
+      Character   
+          v
+        Player
+
+*/
 
 /////////////////////////////////////////////////////////////////////////////////
 // create code
@@ -7,30 +22,30 @@ var create = function(data) // data contains an obj with all the data from the p
     // image maker creates new spritesheets of characters with various items
     var imgMaker = setupImageMaker(data);
 
-    // camera
+    // camera //
     var camera = setupCamera();
 
-    // create and draw world
-    world = setupWorld(data, camera);
-    objectsToUpdate.push(world)
+    
 
-    // create sprite class and animations
+    // create sprite classes and animations //
     Sprite = setupSpriteClass(data, camera);
-    Character = setupCharacterClass(data);
+    Character = setupCharacterClass(camera);
     Player = setupPlayerClass(data);
 
-    // controls
+    // create and draw world //
+    world = setupWorld(data, camera);
+    objectsToUpdate.push(world);
+    world.setupScenery(Sprite);
+
+    // controls //
     var controls = initPlayerControls();
 
     //////////////////////////////////////////
     
-    var testEnemy = new Character("skeleton", 768-32, 992-32);
-    objectsToUpdate.push(testEnemy);
+    // var testEnemy = new Character("skeleton", 768-32, 992-32);
+    // objectsToUpdate.push(testEnemy);
 
-    var rock = new Sprite("rock", 16, 16, 0, 0, 16);
-    objectsToUpdate.push(rock);
-    rock.frame = [1, 0]
-
+    // Player //
     var player = new Player("male-light", 20, 50, controls, camera);
     objectsToUpdate.push(player);
     
@@ -38,6 +53,9 @@ var create = function(data) // data contains an obj with all the data from the p
     camera.following = player;
     camera.world = world;
     objectsToUpdate.push(camera)
+
+    collisionCheck(player, world.collideableScenery);
+    
 }
 
 

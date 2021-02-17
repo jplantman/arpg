@@ -34,6 +34,27 @@ var setupWorld = function(data, camera){
             ['g', 'g0', 'g', 'g', 'g2', 'g', 'g', 'g2', 'g', 'g', 'g', 'g', 'g', 'g', 'g2', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g'],
             ['g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g1', 'g', 'g', 'g', 'g', 'g', 'g']
         ],
+        scenery: [
+            ['rock', 16, 16],
+            ['rock', 16*10, 16*3],
+            ['rock', 16*35, 16*22],
+            ['rock', 16*20, 16*2],
+            ['rock', 16*9, 16*28],
+        ],
+        collideableScenery: [],
+        setupScenery:function(Sprite){
+            for (let i = 0; i < this.scenery.length; i++) {
+                const element = this.scenery[i];
+                
+                var sceneryObj = new Sprite(element[0], element[1], element[2]); //, 0, 0, 16);
+                objectsToUpdate.push(sceneryObj);
+
+                // certain scenery but not others should be collide enabled
+                if (element[0] == 'rock'){
+                    this.collideableScenery.push(sceneryObj);
+                }
+            }
+        },
         draw: function(){
             // console.log(this.array);
             for (let row = 0; row < this.array.length; row++) {

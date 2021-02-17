@@ -1,36 +1,45 @@
 var setupSpriteClass = function(data, camera){
 
     class Sprite{
-        constructor(imgName, x, y, hitRadius, hitdx, hitdy ){
+        constructor(imgName, x, y, modifiedHitbox){
             let imgData = data.images[imgName]
             this.imgObj = imgData[0];
             this.frameWidth = imgData[1];
             this.frameHeight = imgData[2];
 
+            this.lastx; // store these values when moving, so we can revert to old position in case of collision
+            this.lasty;
+
             this.x = x;
             this.y = y;
             this.frame = [0, 0];
 
-            this.hitCircle = {
-                x: function(){ return this.x-hitdx; },
-                y: function(){ return this.y-hitdy; },
-                r: hitRadius
-            }
+            // can pass custom hitbox, else default hitbox will == sprite's dimensions
+            this.hitboxData = modifiedHitbox || {w: this.frameWidth, h: this.frameHeight, dx:0, dy:0}
+
         }
 
-        collidingWithCircle(otherCircle){
-            var x = this.hitCircle.x - otherCircle.x;
-            var y = this.hitCircle.y - otherCircle.y;
-        
-            var dist = Math.sqrt(x*x+y*y);
-        
-            // circles are colliding if the distance between them is <= the sum of their radii
-        
-            return dist <= this.hitCircle.r + otherCircle.r; 
+        // returns a hitbox of current location, OR of alternate location if parameters are passed
+        // for use in collision detection functions, instead of the full sprite object
+        hitbox(x, y){
+            this.hitboxData.x = x ? x-this.frameWidth/2 + this.hitboxData.dx : this.x-this.frameWidth/2 + this.hitboxData.dx;
+            this.hitboxData.y = y ? y-this.frameHeight/2 + this.hitboxData.dy : this.y- this.frameHeight/2+ this.hitboxData.dy;
+            return this.hitboxData;
         }
+
+        // collidingWithCircle(otherCircle){    // OLD, consider deleting this code
+        //     var x = this.hitCircle.x - otherCircle.x;
+        //     var y = this.hitCircle.y - otherCircle.y;
+        
+        //     var dist = Math.sqrt(x*x+y*y);
+        
+        //     // circles are colliding if the distance between them is <= the sum of their radii
+        
+        //     return dist <= this.hitCircle.r + otherCircle.r; 
+        // }
 
         update(dt){
-
+            
         }
 
         draw(){

@@ -12,7 +12,9 @@ var setupCamera = function(){
             
         },
         draw: function(){}
+        
     }
+
 
     return camera;
 }
