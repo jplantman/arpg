@@ -1,10 +1,16 @@
 // click to move
 
+// controls is passed to the player.
+// player isn't ever controlled directly from here, but controller will record all data relating to player input, and the player can handle it during their update
+
 var initPlayerControls = function(camera){
+
+    // this is the controls data the player gets to see
     controls = {
         mouseIsDown: false,
         mousePosition: undefined
     }
+
     canvas.addEventListener('mousedown', function(e){
         controls.mouseIsDown = e.which;
         if (e.which == 1){
@@ -14,19 +20,20 @@ var initPlayerControls = function(camera){
         else if (e.which == 3){
         }
         
-    })
+    });
+
     canvas.addEventListener('contextmenu', function(e){
         e.preventDefault();
-    })
+    });
+
     canvas.addEventListener('mouseup', function(){
         controls.mouseIsDown = false;
-    })
+    });
+    
 
     canvas.addEventListener('mousemove', function(e){
-        // console.log(e.offsetX, e.offsetY);
         if (controls.mouseIsDown){
             controls.mousePosition = [e.offsetX , e.offsetY];
-            // console.log(e.offsetX, camera.x);
         }
     });
 

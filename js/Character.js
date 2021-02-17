@@ -1,8 +1,15 @@
 var setupCharacterClass = function(camera){
 
     class Character extends Sprite {
-        constructor(imgData, x, y){
-            super (imgData, x, y, {dx:16, dy:24, w:32, h:40});
+        constructor(imgData, x, y, options){
+
+            options = options || {};
+
+            // default hit circle size
+            options.modifiedHitcircle = 
+                    options.modifiedHitcircle || {dx:0, dy:10, r: 20, resolutionWeight: 50};
+
+            super (imgData, x, y, options );
 
             this.frame = [0, 10];
 
@@ -29,19 +36,10 @@ var setupCharacterClass = function(camera){
 
             this.movementSpeed = 80;
             this.movingTo = undefined;
+            this.movingToCue = [];
 
         }
 
-        draw(){
-            super.draw();
-
-            // show the hitbox, for debugging!
-            var hitbox = this.hitbox();
-            ctx.fillStyle = 'red';
-            ctx.globalAlpha = 0.3;
-            ctx.fillRect(hitbox.x - camera.x+camera.width/2, hitbox.y - camera.y+camera.height/2, hitbox.w, hitbox.h);
-            ctx.globalAlpha = 1;
-        }
 
         stopMoving(){
             this.movingTo = undefined;
@@ -55,6 +53,7 @@ var setupCharacterClass = function(camera){
                 this.frame = [0, 11]
             } 
             this.currentAnimation = undefined;
+            this.movingToCue = [];
         }
 
         updateMovement(dt){
@@ -84,7 +83,14 @@ var setupCharacterClass = function(camera){
                     this.x += velocityX * dt/1000;
                     this.y += velocityY * dt/1000;
                 } else {
-                    this.stopMoving();
+                    // else, you've arrived!
+                    // check to see if there's more movement cued up
+                    if (this.movingToCue.length){
+                        this.movingTo = this.movingToCue.shift();
+                    } else {
+                        this.stopMoving();
+                    }
+                    
                 }       
             }
         }

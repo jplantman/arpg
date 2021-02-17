@@ -60,7 +60,7 @@ var images;
         "woodwand-male": ["imgs/weapons/woodwand_male.png", 64, 64],
 
         "rock": ["imgs/scenery/rock.png", 32, 32],
-        "trunk": ["imgs/scenery/trunk.png", 32, 32],
+        "trunk": ["imgs/scenery/trunk.png", 96, 96],
         "treetop": ["imgs/scenery/treetop.png", 32, 32],
         "dirt": ["imgs/scenery/dirt.png", 32, 32],
         "dirt2": ["imgs/scenery/dirt2.png", 32, 32],

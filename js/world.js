@@ -1,6 +1,20 @@
+// Scenery objects data //
+// holds options parameter for each type of scenery object
+var sceneryObjectsData = {
+    "trunk": {
+        modifiedHitbox: {
+            // do this next
+        }
+    }
+}
+
+
+// set up world
 var setupWorld = function(data, camera){
 
+    // world object is exported into create function
     var world = {
+        
         array:[
             ['g1', 'g1', 'g1', 'g1', 'g', 'g0', 'g', 'g', 'g', 'g', 'g', 'g0', 'g', 'g', 'g', 'g0', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g'],
             ['g', 'g1', 'g', 'g0', 'g', 'g', 'g', 'g', 'g0', 'g', 'g', 'g0', 'g0', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'g'],
@@ -40,18 +54,32 @@ var setupWorld = function(data, camera){
             ['rock', 16*35, 16*22],
             ['rock', 16*20, 16*2],
             ['rock', 16*9, 16*28],
+            ['trunk', 16*20, 16*20],
         ],
-        collideableScenery: [],
+        // holds all scenery elements that will collide with the characters
+        collideableSceneryCircle: [],
+        collideableSceneryRectangle: [],
+
+        // set upo scenery //
         setupScenery:function(Sprite){
             for (let i = 0; i < this.scenery.length; i++) {
                 const element = this.scenery[i];
+
+                // get the correct options data for the element being made
+                var options = element[3] || {};
+
+                // figure out which class function should be run. default is Sprite class
+                var correctClassFunction = options.class || Sprite
                 
-                var sceneryObj = new Sprite(element[0], element[1], element[2]); //, 0, 0, 16);
+                var sceneryObj = new correctClassFunction( element[0], element[1], element[2], options );
                 objectsToUpdate.push(sceneryObj);
 
                 // certain scenery but not others should be collide enabled
                 if (element[0] == 'rock'){
-                    this.collideableScenery.push(sceneryObj);
+                    this.collideableSceneryCircle.push(sceneryObj);
+                }
+                if (element[0] == 'trunk'){
+                    this.collideableSceneryRectangle.push(sceneryObj);
                 }
             }
         },
@@ -117,8 +145,7 @@ var setupWorld = function(data, camera){
     world.width = world.array[0].length*32;
     world.height = world.array.length*32;
 
-    
-    console.log('world width and height', world.width, world.height)
+   
     return world;
 
 

@@ -2,7 +2,7 @@
 
   preload.js
   create (in this file, index.html)
-  gameLoop.js
+  loop.js
 
 
   **** Family Tree ****
@@ -54,7 +54,19 @@ var create = function(data) // data contains an obj with all the data from the p
     camera.world = world;
     objectsToUpdate.push(camera)
 
-    collisionCheck(player, world.collideableScenery);
+    var testCallback = function(){
+        console.log("collision!")
+    }
+    enableCollisions(player, {
+        target: world.collideableSceneryCircle,
+        type: 'circlevscircles',
+        resolution: true,
+        callback: testCallback,
+        callbackParams: undefined
+    });
+
+
+    
     
 }
 
