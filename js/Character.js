@@ -11,8 +11,14 @@ var setupCharacterClass = function(camera){
 
             super (imgData, x, y, options );
 
+            this.dx; // how much you moved last time you moved, used for collision resolution
+            this.dy;
+
+            // set initial frame
             this.frame = [0, 10];
 
+            // add animations, which assume the standard spritesheet coming from LPC character generator
+            // http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/
             Sprite.addAnimation(
                 this, 'walkDown', 
                 [[1, 10], [2, 10], [3, 10], [4, 10], [5, 10], [6, 10], [7, 10], [8, 10]],
@@ -80,8 +86,10 @@ var setupCharacterClass = function(camera){
                         if (vectorY > 0){ this.currentAnimation = 'walkDown' }
                         else { this.currentAnimation = 'walkUp' }
                     }
-                    this.x += velocityX * dt/1000;
-                    this.y += velocityY * dt/1000;
+                    // this.dx = velocityX * dt/1000;
+                    // this.dy = velocityY * dt/1000;
+                    this.x += velocityX * dt/1000; // this.dx;
+                    this.y += velocityY * dt/1000; // this.dy;
                 } else {
                     // else, you've arrived!
                     // check to see if there's more movement cued up

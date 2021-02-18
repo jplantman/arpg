@@ -61,13 +61,13 @@ var images;
 
         "rock": ["imgs/scenery/rock.png", 32, 32],
         "trunk": ["imgs/scenery/trunk.png", 96, 96],
-        "treetop": ["imgs/scenery/treetop.png", 32, 32],
-        "dirt": ["imgs/scenery/dirt.png", 32, 32],
-        "dirt2": ["imgs/scenery/dirt2.png", 32, 32],
-        "grass": ["imgs/scenery/grass.png", 32, 32],
-        "grass2": ["imgs/scenery/grassalt.png", 32, 32],
-        "water": ["imgs/scenery/water.png", 32, 32],
-        "watergrass": ["imgs/scenery/watergrass.png", 32, 32],
+        "treetop": ["imgs/scenery/treetop.png", 96, 96],
+        "dirt": ["imgs/tilesets/dirt.png", 32, 32],
+        "dirt2": ["imgs/tilesets/dirt2.png", 32, 32],
+        "grass": ["imgs/tilesets/grass.png", 32, 32],
+        "grass2": ["imgs/tilesets/grassalt.png", 32, 32],
+        // "water": ["imgs/tilesets/water.png", 32, 32],
+        // "watergrass": ["imgs/tilesets/watergrass.png", 32, 32],
         
 
     };
@@ -83,7 +83,7 @@ var images;
             // all images are loaded! export imagesToPreload 
             timeWhenLoadingEnded = Date.now();
             var totalLoadingTime = timeWhenLoadingEnded - timeWhenLoadingStarted;
-            console.log("Total loading time in milliseconds is: " + totalLoadingTime);
+            console.log("Loaded "+imagesNeededToPreload+" images in " + totalLoadingTime+" milliseconds");
             create({
                 images: imagesToPreload
             });

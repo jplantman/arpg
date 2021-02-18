@@ -17,28 +17,33 @@
 
 /////////////////////////////////////////////////////////////////////////////////
 // create code
-var create = function(data) // data contains an obj with all the data from the preload phase and any other previous step
+const create = function(data) // data contains an obj with all the data from the preload phase and any other previous step
 {
     // image maker creates new spritesheets of characters with various items
-    var imgMaker = setupImageMaker(data);
+    const imgMaker = setupImageMaker(data);
 
     // camera //
-    var camera = setupCamera();
+    const camera = setupCamera();
 
     
 
     // create sprite classes and animations //
+    // all setupXClass functions return the class object
     Sprite = setupSpriteClass(data, camera);
     Character = setupCharacterClass(camera);
     Player = setupPlayerClass(data);
 
+    // create classes for scenery objects
+    Tree = setupTreeClass();
+
     // create and draw world //
-    world = setupWorld(data, camera);
+    world = setupWorld(data, camera, testLevel);
     objectsToUpdate.push(world);
-    world.setupScenery(Sprite);
+    world.processObjectsFromTiledData(Sprite);
+    
 
     // controls //
-    var controls = initPlayerControls();
+    const controls = initPlayerControls();
 
     //////////////////////////////////////////
     
@@ -46,7 +51,7 @@ var create = function(data) // data contains an obj with all the data from the p
     // objectsToUpdate.push(testEnemy);
 
     // Player //
-    var player = new Player("male-light", 20, 50, controls, camera);
+    const player = new Player("male-light", world.playerStart[0], world.playerStart[1], controls, camera);
     objectsToUpdate.push(player);
     
     player.imgObj = imgMaker(["male-light","shirt-brown-longsleeve" , "leather-chest-male", "teal-pants-male", "spear-male"]);
@@ -54,15 +59,17 @@ var create = function(data) // data contains an obj with all the data from the p
     camera.world = world;
     objectsToUpdate.push(camera)
 
-    var testCallback = function(){
-        console.log("collision!")
-    }
+    // Enable collisions between player and scenery objects
     enableCollisions(player, {
-        target: world.collideableSceneryCircle,
+        target: world.collideableSceneryCircles,
         type: 'circlevscircles',
-        resolution: true,
-        callback: testCallback,
-        callbackParams: undefined
+        resolution: true
+    });
+
+    enableCollisions(player, {
+        target: world.collideableSceneryRectangles,
+        type: 'circlevsrectangles',
+        resolution: true
     });
 
 

@@ -2,6 +2,9 @@ var setupPlayerClass = function(){
     class Player extends Character {
         constructor(imgData, x, y, controls, camera){
             super (imgData, x, y);
+
+            this.type = "player";
+            this.collisionCounter = 0;
             
             this.controls = controls;
             this.camera = camera;

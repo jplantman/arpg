@@ -8,6 +8,22 @@
         </style>
     </head>
     <body>
+        <script>
+            // error catch helper friend
+            var errorMessages = [];
+            function addError(error){
+                errorMessages.push(error)
+                if (errorMessages.length == 1){
+                    console.error("There's at least 1 error. have a look at the window.errorMessages array to see them.");
+                    console.log("errors so far: ", errorMessages);
+                }
+            }
+
+        </script>
+
+        <script src="tilemaps/testLevel.js"></script>
+
+
         <script src="js/canvas.js"></script>
 
 
@@ -17,9 +33,12 @@
         <script src="js/imageMaker.js"></script>
         <script src="js/math.js"></script>
         <script src="js/controls.js"></script>
+
         <script src="js/Sprite.js"></script>
         <script src="js/Character.js"></script>
         <script src="js/Player.js"></script>
+        <script src="js/Tree.js"></script>
+        
         <script src="js/preload.js"></script>
         <script src="js/index.js"></script>
 
