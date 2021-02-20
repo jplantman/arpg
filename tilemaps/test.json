@@ -96,8 +96,8 @@
                  "type":"player",
                  "visible":true,
                  "width":0,
-                 "x":160,
-                 "y":160
+                 "x":192,
+                 "y":192
                 }, 
                 {
                  "gid":39,
@@ -111,7 +111,7 @@
                          "value":true
                         }],
                  "rotation":0,
-                 "type":"etrunk",
+                 "type":"trunk",
                  "visible":true,
                  "width":92,
                  "x":224,
@@ -129,7 +129,7 @@
                          "value":false
                         }],
                  "rotation":0,
-                 "type":"etrunk",
+                 "type":"trunk",
                  "visible":true,
                  "width":92,
                  "x":544,
@@ -147,11 +147,52 @@
                          "value":false
                         }],
                  "rotation":0,
-                 "type":"etrunk",
+                 "type":"trunk",
                  "visible":true,
                  "width":92,
                  "x":576,
                  "y":512
+                }, 
+                {
+                 "height":0,
+                 "id":27,
+                 "name":"Fred",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"spritesheetName",
+                         "type":"string",
+                         "value":"male-darkelf"
+                        }, 
+                        {
+                         "name":"wearing",
+                         "type":"string",
+                         "value":"shirt-white-longsleeve white-pants-male"
+                        }],
+                 "rotation":0,
+                 "type":"npc",
+                 "visible":true,
+                 "width":0,
+                 "x":320,
+                 "y":96
+                }, 
+                {
+                 "height":0,
+                 "id":28,
+                 "name":"",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"spritesheetName",
+                         "type":"string",
+                         "value":"skeleton"
+                        }],
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":0,
+                 "x":160,
+                 "y":544
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -160,7 +201,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":27,
+ "nextobjectid":29,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.4.3",

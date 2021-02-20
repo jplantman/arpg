@@ -30,6 +30,9 @@ var setupSpriteClass = function(data, camera){
             if (options.modifiedHitbox){
                 this.hitcircleData = undefined;
                 this.hitboxData = options.modifiedHitbox;
+                this.bodyShape = 'rect'; // helps w collisions
+            }else {
+                this.bodyShape = 'circle';
             }
         }
 
@@ -54,12 +57,40 @@ var setupSpriteClass = function(data, camera){
         draw(){
 
             if (this.currentAnimation){
-                var animObj = this.animations[this.currentAnimation]
+                
+                // fetch the current animation's data
+                var animData = this.animations[this.currentAnimation]
                 this.frameCount++;
-                if (this.frameCount >= animObj[1]){
+                if (this.frameCount >= animData.framesPerFrame){ // if frameCount has reached the framesPerframe...
                     this.frameCount = 0;
-                    this.animationIndex = (this.animationIndex+1)%animObj[0].length;
-                    this.frame = animObj[0][this.animationIndex];
+                    // progress the animation index by 1
+                    this.animationIndex+= 1
+                    // check to see if we're at the end of the animation
+                    if (this.animationIndex+1 >= animData.framesArray.length){
+                        // if we are, handle the potential callback
+                        if (animData.callback){
+                            animData.callback();
+                        }
+                        // should the animation only run once?
+                        if (animData.onlyOnce){
+                            this.currentAnimation = undefined;
+                        }
+                    }
+                    // if we still have an animation going after the callback, continue/loop the animation
+                    if (this.currentAnimation){
+                        
+                        this.animationIndex = this.animationIndex%animData.framesArray.length;
+                        this.frame = animData.framesArray[this.animationIndex];
+                    }
+                    
+                    // if (animData.onlyOnce && this.animationIndex+1 >= animData.framesArray.length  ){
+                    //     // if only once and at the end, stop
+                    // } else {
+                    //     // else, continue animation as normal
+                    //     this.animationIndex = (this.animationIndex+1)%animData.framesArray.length;
+                    //     this.frame = animData.framesArray[this.animationIndex];
+                    // }
+                    
                 }
             }
             ctx.drawImage(
@@ -70,7 +101,8 @@ var setupSpriteClass = function(data, camera){
                 this.frameWidth, this.frameHeight
             )
 
-            var debugging = false; // shows collision bodies
+            // Debugging Hitboxes //
+            var debugging = true; // shows collision bodies
             if (debugging){
                 if (this.hitcircleData){
                     var hitcircle = this.hitcircle();
@@ -97,13 +129,43 @@ var setupSpriteClass = function(data, camera){
         }
     }
 
+    // stop animation
+    Sprite.prototype.stopAnimation = function(){
+        this.currentAnimation = undefined;
+        this.animationIndex = 0;
+        this.frameCount = 0;
+    }
+
+    Sprite.prototype.animate = function(animName){
+        this.currentAnimation = animName;
+    }
+
     // sprite.currentAnimation = "animationName"; to animate
-    Sprite.addAnimation = function(sprite, animationName, framesArray, framesPerFrame){
+    // This function initialises an animation sequence for a sprite
+    Sprite.addAnimation = function(sprite, animationName, framesArray, framesPerFrame, onlyOnce, callback){
         sprite.animations = sprite.animations || {};
-        sprite.animations[animationName] = [framesArray, framesPerFrame];
+        // this will be the data stored for each animation
+        sprite.animations[animationName] = {
+            framesArray: framesArray, // an array of animation frame coordinate pairs, example: [ [0, 0], [1, 0], [2, 0] ]
+            framesPerFrame: framesPerFrame, // how many game frames should each animation frame last
+            onlyOnce: onlyOnce,
+            callback: callback // callback function to run on complete.
+            // if anim should only run once, end it in the callback
+        };
         sprite.frameCount = sprite.frameCount || 0;
         sprite.animationIndex = 0;
-        // sprite.currentAnimation;
+
+        
+    }
+
+    // Tiled sends us custom properties in a weird ass format. We fix it and put them all the way we like
+    Sprite.extractTiledObjectProperties = function(object){
+        for (let i = 0; i < object.properties.length; i++) {
+            const property = object.properties[i];
+            object[property.name] = property.value;
+        }
+        object.properties = null;
+        return object;
     }
 
     return Sprite;

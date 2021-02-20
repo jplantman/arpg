@@ -8,17 +8,14 @@ var initPlayerControls = function(camera){
     // this is the controls data the player gets to see
     controls = {
         mouseIsDown: false,
-        mousePosition: undefined
+        mousePosition: undefined,
+        justClicked: false,
     }
 
     canvas.addEventListener('mousedown', function(e){
         controls.mouseIsDown = e.which;
-        if (e.which == 1){
-            controls.mousePosition = [e.offsetX , e.offsetY];
-            
-        }
-        else if (e.which == 3){
-        }
+        controls.justClicked = true;
+        controls.mousePosition = [e.offsetX , e.offsetY];
         
     });
 
@@ -28,13 +25,12 @@ var initPlayerControls = function(camera){
 
     canvas.addEventListener('mouseup', function(){
         controls.mouseIsDown = false;
+        controls.justClicked = false;
     });
     
 
     canvas.addEventListener('mousemove', function(e){
-        if (controls.mouseIsDown){
-            controls.mousePosition = [e.offsetX , e.offsetY];
-        }
+        controls.mousePosition = [e.offsetX , e.offsetY];
     });
 
     return controls;

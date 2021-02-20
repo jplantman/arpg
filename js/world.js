@@ -35,6 +35,12 @@ var setupWorld = function(data, camera, tiledData){
                         if (object.type == "player"){
                             this.playerStart = [object.x, object.y];
                             continue;
+                        } else if (object.type == 'npc'){
+                            NPC.generateFromTiledData(object);
+                            continue;
+                        } else if (object.type == 'enemy'){
+                            Enemy.generateFromTiledData(object);
+                            continue;
                         }
 
                         // Tiled is weird and sometimes adds an 'e' to the beginning of the imgName (type in Tiled)
@@ -106,19 +112,23 @@ var setupWorld = function(data, camera, tiledData){
             for (let l = 0; l < tiledData.layers.length; l++) {
                 const layer = tiledData.layers[l];
 
+
                 // check to see if it's a tile layer
                 if (layer.type == "tilelayer"){
 
+                    // get the layer's firstgid. Tiled associates these with the tileset, we are sticking to 1 tileset img per layer so we just shlep it on the layer here
+                    var firstgid = tiledData.tilesets[l].firstgid
                     // layer.name == tilesheet name ('dirt', 'grass', etc)
                     var w = this.tilesheetWidth[layer.name];
                     
                     for (let t = 0; t < layer.data.length; t++) {
+                        
 
-                        if (!layer.firstgid){
-                            throw "You have to manually copy/paste the firstgid property into each layer in the Tiled data! Remember each tile layer should only use one spritesheet."
-                        }
+                        // if (!layer.firstgid){ // phasing this out
+                        //     throw "You have to manually copy/paste the firstgid property into each layer in the Tiled data! Remember each tile layer should only use one spritesheet."
+                        // }
                         const n = layer.data[t] // number of tile passed by Tiled  
-                                - (layer.firstgid-1); // this modification accounts for Tiled starting the number count at a different spot for each tilesheet.
+                                - (firstgid-1); // this modification accounts for Tiled starting the number count at a different spot for each tilesheet.
 
                         // after exporting a Tiled map, make sure to add the firstgid property to each layer
                         // cus we are assuming each layer uses only 1 tilesheet
@@ -152,6 +162,8 @@ var setupWorld = function(data, camera, tiledData){
 
         // the thing passed is bound to the world bounds
         bound(thing){
+
+            
             
             if (thing.x - thing.width/2 < 0){
                 thing.x = thing.width/2;

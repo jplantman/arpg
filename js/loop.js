@@ -50,7 +50,7 @@ function updateAndDrawEverything(dt){
 
         element.update(dt);
         element.draw();
-
+        
 
         // Check for collision data and run collision check
         if (element.collisionData){
@@ -58,32 +58,10 @@ function updateAndDrawEverything(dt){
             // loop through the array of collisionDatas
             for (let n = 0; n < element.collisionData.length; n++) {
                 const thisCollisionData = element.collisionData[n];
-               
-                // Check what kind of collision //
-
-                // circle vs circles
-                if (thisCollisionData.type == "circlevscircles"){
-                    
-                    // run check for first circle vs every second circle
-                    var targetArray = thisCollisionData.target;
-                    for (let i = 0; i < targetArray.length; i++) {
-                        const target = targetArray[i];
-                        
-                        // run collision function
-                        circlesvscirclesCollision(element, target, thisCollisionData.resolution, thisCollisionData.callback, thisCollisionData.callbackParams);  
-                    }
-                } else if (thisCollisionData.type == "circlesvsselves") {
-
-                } else if (thisCollisionData.type == "circlevsrectangles") {
-                    
-                    // run check for circle vs every rectangle
-                    var targetArray = thisCollisionData.target;
-                    for (let i = 0; i < targetArray.length; i++) {
-                        const target = targetArray[i];
-                        
-                        // run the collision function
-                        circlevsrectangleCollision(element,target, thisCollisionData.resolution, thisCollisionData.callback);
-                    }
+                // console.log(thisCollisionData)
+                for (let i = 0; i < thisCollisionData.target.length; i++) {
+                    const target = thisCollisionData.target[i];
+                    collisionCheck(element, target, thisCollisionData.resolution, thisCollisionData.callback);
                 }
             }
         }      

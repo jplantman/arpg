@@ -13,6 +13,9 @@ var setupImageMaker = function(data){
         
         var newImg = new Image();
         newImg.src = tempCanvas.toDataURL();
+
+        // document.body.appendChild(tempCanvas); // show the made canvas
+
         return newImg;
     }
 

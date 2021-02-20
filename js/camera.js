@@ -15,6 +15,10 @@ var setupCamera = function(){
         
     }
 
+    // Camera offsets: (or reverse the + / -)
+    // + this.camera.x - this.camera.width/2
+    // + this.camera.y - this.camera.height/2
+
 
     return camera;
 }

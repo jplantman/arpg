@@ -32,6 +32,8 @@ const create = function(data) // data contains an obj with all the data from the
     Sprite = setupSpriteClass(data, camera);
     Character = setupCharacterClass(camera);
     Player = setupPlayerClass(data);
+    NPC = setupNPCClass(data, imgMaker);
+    Enemy = setupEnemyClass(data, imgMaker);
 
     // create classes for scenery objects
     Tree = setupTreeClass();
@@ -54,7 +56,7 @@ const create = function(data) // data contains an obj with all the data from the
     const player = new Player("male-light", world.playerStart[0], world.playerStart[1], controls, camera);
     objectsToUpdate.push(player);
     
-    player.imgObj = imgMaker(["male-light","shirt-brown-longsleeve" , "leather-chest-male", "teal-pants-male", "spear-male"]);
+    player.imgObj = imgMaker(["male-light","shirt-brown-longsleeve" , "leather-chest-male", "teal-pants-male", "dagger-male"]);
     camera.following = player;
     camera.world = world;
     objectsToUpdate.push(camera)
@@ -69,8 +71,15 @@ const create = function(data) // data contains an obj with all the data from the
     enableCollisions(player, {
         target: world.collideableSceneryRectangles,
         type: 'circlevsrectangles',
-        resolution: true
+        resolution: true,
     });
+
+    enableCollisions(player, {
+        target: Enemy.array,
+        type: 'circlevsrectangles',
+        resolution: true,
+    });
+
 
 
     
