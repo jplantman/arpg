@@ -15,7 +15,7 @@ var setupNPCClass = function(data, imgMaker){
             
         }
         
-        onClick = function(){
+        interact = function(){
             if (this.clickFunc[0] == 'say'){
                 say(this.clickFunc[1]);
                 

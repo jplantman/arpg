@@ -3,27 +3,29 @@
 // enable collisions for specific Sprites //
 function enableCollisions(sprite, collisionData){
 
-    // one and two are the 2 sprites colliding
-    // 
-    // type is for example:
-    //   circlevscircles - one sprite vs an array of sprites 
-    //   circlesvsselves - each member of an array vs all its friends
-    //   circlevsrectangle
-    // resolution is true if the circles can move each other as a result of the collision
-    // callback function
-
-    
     // Sprite is marked by having collisionData property.
     // the loop picks this up and handles it
-    sprite.collisionData = sprite.collisionData || [];
-    sprite.collisionData.push( collisionData );
+    if ( Array.isArray(sprite) ){
+        for (let i = 0; i < sprite.length; i++) {
+            const element = sprite[i];
+            element.collisionData = element.collisionData || [];
+            element.collisionData.push( collisionData );
+        }
+    } else {
+        sprite.collisionData = sprite.collisionData || [];
+        sprite.collisionData.push( collisionData );
+    }
+
+    
 
 }
 
 
-// use this collision check every time. This will handle all the hitbox business and the resolution, keeping that login out of the collision functions themselves
+// use this collision check every time. This will handle all the hitbox business and the resolution, keeping that logic out of the collision functions themselves
 // checks what shape thing is and makes the right collision check
-function collisionCheck(shape, element, resolution, callback){
+function collisionCheck(shape, element, options={}, callback){
+    var result = {}; // this data is returned if there is a collision
+
     if (shape.bodyShape == 'circle'){
         // if the shape is a circle, run it against the right shape from the array
         if (element.bodyShape == 'circle'){
@@ -44,23 +46,26 @@ function collisionCheck(shape, element, resolution, callback){
                 littleHitcircle = shapeHitbox;
             }
 
-            var result = circlesvscirclesCollision(bigHitcircle, littleHitcircle, resolution, callback);
+            var result = circlesvscirclesCollision(bigHitcircle, littleHitcircle, options.resolution, callback);
             if (result){
-                if (resolution){
+                if (options.resolution){
                     little.x += result[0]/8;
                     little.y += result[1]/8;
                 }
                 if (callback){
                     callback(element);
                 }
+                if (options.killOnContact){
+
+                }
             }
         } else if (element.bodyShape == 'rect'){
             // circle vs rectangle
             var hitcircle = shape.hitcircle();
             var hitbox = element.hitbox();
-            var result = circlevsrectangleCollision(hitcircle, hitbox, resolution, callback);
+            var result = circlevsrectangleCollision(hitcircle, hitbox, options.resolution, callback);
             if (result){
-                if (resolution){
+                if (options.resolution){
                 // this simple resolution just moves the guy back by as much as the sides calculated above.
                 // perhaps I can make it smoother by implementing the code below explained in the stack over flow post linked. but fine for now
       
@@ -222,4 +227,32 @@ var isPointInRectangle = function(point, rect){
     point.y >= rect.y && point.y <= rect.y+rect.h;
 }
 
+// Probably wont need this. but maybe something similar so save it
+// var findPointBetween = function(one, two, distance){
+//     // find the point between Sprite one and two that leaves sprite one at distance away from two
+//     // this is to help get one Sprite to move close enough to another to interact
+//     // can do this by finding the point that is distance away from point two, in the direction coming from one
+    
+//     // get the hit data for each thing
+//     var onehit, oSize, twohit, tSize;
+//     //hitbox and the 'size' (radius or width/2) of each body 
+//     if (one.bodyShape == 'circle'){
+//         onehit = one.hitcircle();
+//         oSize = onehit.r;
+//     } else if (one.bodyShape == 'rect'){
+//         onehit = one.hitbox();
+//         oSize = onehit.w/2;
+//     }
 
+//     if (two.bodyShape == 'circle'){
+//         twohit = two.hitcircle();
+//         tSize = twohit.r;
+//     } else if (two.bodyShape == 'rect'){
+//         twohit = two.hitbox();
+//         tSize = twohit.w/2;
+//     }
+
+//     // now find the angle, from two to one
+
+
+// }

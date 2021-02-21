@@ -10,16 +10,21 @@ var setupSpriteClass = function(data, camera){
             options = options || {};
             bonusOptions = bonusOptions || {};
 
-            // get img data using the imgName
-            let imgData = data.images[imgName];
+            // get img data using the imgName, (if there is an image. can be invisible)
+            this.imgData;
+            if (imgName){
+                this.imgData = data.images[imgName];
+                this.imgObj = this.imgData[0];
+                this.frameWidth = this.imgData[1];
+                this.frameHeight = this.imgData[2];
+                this.frame = [0, 0];
+            }
             
-            this.imgObj = imgData[0];
-            this.frameWidth = imgData[1];
-            this.frameHeight = imgData[2];
+            
+            
 
             this.x = x;
             this.y = y;
-            this.frame = [0, 0];
 
             // can pass custom hitbox, else default hitbox will == sprite's dimensions
             // resolutionWeight: the higher it is, the more priority for staying still in a collision resolution
@@ -39,8 +44,8 @@ var setupSpriteClass = function(data, camera){
         // returns a hitbox of current location, OR of alternate location if parameters are passed
         // for use in collision detection functions, instead of the full sprite object
         hitcircle(x, y){
-            this.hitcircleData.x = x ? x + this.hitcircleData.dx : this.x + this.hitcircleData.dx;
-            this.hitcircleData.y = y ? y + this.hitcircleData.dy : this.y + this.hitcircleData.dy;
+            this.hitcircleData.x = x ? x + (this.hitcircleData.dx || 0) : this.x + (this.hitcircleData.dx || 0);
+            this.hitcircleData.y = y ? y + (this.hitcircleData.dy || 0) : this.y + (this.hitcircleData.dy || 0);
             return this.hitcircleData;
         }
 
@@ -50,13 +55,39 @@ var setupSpriteClass = function(data, camera){
             return this.hitboxData;
         }
 
-        update(dt){
-            
-        }
+        update(dt){}
 
         draw(){
+            // Debugging Hitboxes //
+            var debugging = true; // shows collision bodies
+            if (debugging){
+                if (this.hitcircleData){
+                    var hitcircle = this.hitcircle();
+                    ctx.fillStyle = 'red';
+                    ctx.globalAlpha = 0.3;
+                    ctx.beginPath();
+                    ctx.arc(hitcircle.x - camera.x+camera.width/2, 
+                        hitcircle.y - camera.y+camera.height/2, 
+                        hitcircle.r, 
+                        0, 2*3.142)
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                } else if (this.hitboxData){
+                    var hitbox = this.hitbox();
+                    ctx.fillStyle = 'red';
+                    ctx.globalAlpha = 0.3;
+                    ctx.fillRect(
+                        hitbox.x - camera.x+camera.width/2, 
+                        hitbox.y - camera.y+camera.height/2, 
+                        hitbox.w, hitbox.h);
+                    ctx.globalAlpha = 1;
+                }                
+            }
+            // draw nothing if this is invisible
+            if (!this.imgData){ return }
 
             if (this.currentAnimation){
+                console.log(this.currentAnimation)
                 
                 // fetch the current animation's data
                 var animData = this.animations[this.currentAnimation]
@@ -67,13 +98,13 @@ var setupSpriteClass = function(data, camera){
                     this.animationIndex+= 1
                     // check to see if we're at the end of the animation
                     if (this.animationIndex+1 >= animData.framesArray.length){
-                        // if we are, handle the potential callback
-                        if (animData.callback){
-                            animData.callback();
-                        }
                         // should the animation only run once?
                         if (animData.onlyOnce){
                             this.currentAnimation = undefined;
+                        }
+                        // if we are, handle the potential callback
+                        if (animData.callback){
+                            animData.callback();
                         }
                     }
                     // if we still have an animation going after the callback, continue/loop the animation
@@ -101,43 +132,46 @@ var setupSpriteClass = function(data, camera){
                 this.frameWidth, this.frameHeight
             )
 
-            // Debugging Hitboxes //
-            var debugging = true; // shows collision bodies
-            if (debugging){
-                if (this.hitcircleData){
-                    var hitcircle = this.hitcircle();
-                    ctx.fillStyle = 'red';
-                    ctx.globalAlpha = 0.3;
-                    ctx.beginPath();
-                    ctx.arc(hitcircle.x - camera.x+camera.width/2, 
-                        hitcircle.y - camera.y+camera.height/2, 
-                        hitcircle.r, 
-                        0, 2*3.142)
-                    ctx.fill();
-                    ctx.globalAlpha = 1;
-                } else if (this.hitboxData){
-                    var hitbox = this.hitbox();
-                    ctx.fillStyle = 'red';
-                    ctx.globalAlpha = 0.3;
-                    ctx.fillRect(
-                        hitbox.x - camera.x+camera.width/2, 
-                        hitbox.y - camera.y+camera.height/2, 
-                        hitbox.w, hitbox.h);
-                    ctx.globalAlpha = 1;
-                }                
-            }
+            // // Debugging Hitboxes //
+            // var debugging = true; // shows collision bodies
+            // if (debugging){
+            //     if (this.hitcircleData){
+            //         var hitcircle = this.hitcircle();
+            //         ctx.fillStyle = 'red';
+            //         ctx.globalAlpha = 0.3;
+            //         ctx.beginPath();
+            //         ctx.arc(hitcircle.x - camera.x+camera.width/2, 
+            //             hitcircle.y - camera.y+camera.height/2, 
+            //             hitcircle.r, 
+            //             0, 2*3.142)
+            //         ctx.fill();
+            //         ctx.globalAlpha = 1;
+            //     } else if (this.hitboxData){
+            //         var hitbox = this.hitbox();
+            //         ctx.fillStyle = 'red';
+            //         ctx.globalAlpha = 0.3;
+            //         ctx.fillRect(
+            //             hitbox.x - camera.x+camera.width/2, 
+            //             hitbox.y - camera.y+camera.height/2, 
+            //             hitbox.w, hitbox.h);
+            //         ctx.globalAlpha = 1;
+            //     }                
+            // }
         }
     }
 
     // stop animation
     Sprite.prototype.stopAnimation = function(){
+        console.log('stopped animation')
         this.currentAnimation = undefined;
         this.animationIndex = 0;
         this.frameCount = 0;
     }
 
     Sprite.prototype.animate = function(animName){
+        console.log('animation was previously ', this.currentAnimation);
         this.currentAnimation = animName;
+        console.log('called to animate ', this.currentAnimation)
     }
 
     // sprite.currentAnimation = "animationName"; to animate

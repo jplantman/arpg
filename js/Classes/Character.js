@@ -46,7 +46,9 @@ var setupCharacterClass = function(camera){
                 5
             )
 
+                
             this.finishedAttacking = function(){
+                console.log('finishedAttacking');
                 that.isAttacking = false;
                 // stand normally facing the direction you were just attacking
                 switch(that.direction){
@@ -64,43 +66,75 @@ var setupCharacterClass = function(camera){
                         break;
                 }
             }
+
+            /////////////////    start attacking    //////////////////
             Sprite.addAnimation(
                 this, 'slashUp', 
-                [[0, 12], [1, 12], [2, 12], [3, 12], [4, 12], [5, 12], [4, 12], [3, 12], [2, 12]],
+                [[0, 12], [1, 12], [2, 12], [3, 12], [4, 12], [5, 12]],
                 5,
                 true,
-                this.finishedAttacking
+                this.basicAttack.bind(this)
             )
             Sprite.addAnimation(
                 this, 'slashLeft', 
-                [[0, 13], [1, 13], [2, 13], [3, 13], [4, 13], [5, 13], [4, 13], [3, 13], [2, 13]],
+                [[0, 13], [1, 13], [2, 13], [3, 13], [4, 13], [5, 13]],
                 5,
                 true,
-                this.finishedAttacking
+                this.basicAttack.bind(this)
             )
             Sprite.addAnimation(
                 this, 'slashDown', 
-                [[0, 14], [1, 14], [2, 14], [3, 14], [4, 14], [5, 14], [4, 14], [3, 14], [2, 14]],
+                [[0, 14], [1, 14], [2, 14], [3, 14], [4, 14], [5, 14]],
+                5,
+                true,
+                this.basicAttack.bind(this)
+            )
+            Sprite.addAnimation(
+                this, 'slashRight', 
+                [[0, 15], [1, 15], [2, 15], [3, 15], [4, 15], [5, 15]],
+                5,
+                true,
+                this.basicAttack.bind(this)
+            )
+                //////////////  Attack Finish  ////////////////////////////
+
+            Sprite.addAnimation(
+                this, 'slashUpFinish', 
+                [[4, 12], [3, 12], [2, 12]],
                 5,
                 true,
                 this.finishedAttacking
             )
             Sprite.addAnimation(
-                this, 'slashRight', 
-                [[0, 15], [1, 15], [2, 15], [3, 15], [4, 15], [5, 15], [4, 15], [3, 15], [2, 15]],
+                this, 'slashLeftFinish', 
+                [[4, 13], [3, 13], [2, 13]],
+                5,
+                true,
+                this.finishedAttacking
+            )
+            Sprite.addAnimation(
+                this, 'slashDownFinish', 
+                [[4, 14], [3, 14], [2, 14]],
+                5,
+                true,
+                this.finishedAttacking
+            )
+            Sprite.addAnimation(
+                this, 'slashRightFinish', 
+                [[4, 15], [3, 15], [2, 15]],
                 5,
                 true,
                 this.finishedAttacking
             )
 
+            ///////////////////////////
+
             this.movementSpeed = 80;
-            this.movingTo = undefined;
-            this.movingToCue = [];
             this.actionCue = [];
         }
 
         stopMoving(){
-            this.movingTo = undefined;
+            this.actionCue = [];
             if (this.currentAnimation == 'walkDown'){
                 this.frame = [0, 10]
             } else if (this.currentAnimation == 'walkUp'){
@@ -111,89 +145,49 @@ var setupCharacterClass = function(camera){
                 this.frame = [0, 11]
             } 
             this.stopAnimation();
-            this.movingToCue = [];
         }
 
         updateActionCue(dt){
             // action cue takes action arrays like:
-            // ["move", x, y] or ["attack", {Enemy}, range]
-
+            // ["move", x, y] or ["attack", {Enemy}, range] or ["interact", {Chest}, range]
+            // this function will make a Character walk up to something/somewhere and do some action there
+            
             var action = this.actionCue[0];
-            // If action is to move
-            if (!action){
-                return; // if no action, do nothing
-            }
-            else if (action[0] == "move"){
+            
+            // if there's an action...
+            if (action){ 
+                // get the details
+                var x, y, range, actionType;
+                // check if the action is to a point or a Sprite
                 if (typeof action[1] == 'number'){
-                    this.moveTo(action[1], action[2]);
-                } else if (typeof action[1] == "object"){ // else, move target should be a sprite
-                    // expecting ["move", {Sprite}, closeEnoughRange]
-                    this.moveTo(action[1].x, action[1].y, action[2])
-                } else {
-                    addError("Don't know how to handle this action: ", action);
-                } 
-            } else if (action[0] == 'interact'){
-
-            } else if (action[0] == "attack"){
-
-            }
-        }
-
-        moveTo(x, y, closeEnough){
-            // if passed x y coordinates, move to there
-                // move to spot
-            // get the x and y vectors for this player moving towards a point
-            var vectorX = x - this.x;
-            var vectorY = y - this.y - 22; // -22 so the feet land at the location, rather than the waist area
-            // if far from point, keep moving
-            var closeEnough = closeEnough || this.movementSpeed/70; // how far from point  is close enough depends on how fast you're moving
-            if (Math.sqrt( vectorX*vectorX + vectorY*vectorY ) > closeEnough){
-                var sideX = Math.abs(vectorX);
-                var sideY = Math.abs(vectorY);
-
-                var sum = sideX + sideY;
-
-                var velocityX = vectorX / sum * this.movementSpeed;
-                var velocityY = vectorY / sum * this.movementSpeed;
-
-                if ( sideX > sideY ){
-                    if (vectorX > 0){ this.animate('walkRight') }
-                    else { this.animate('walkLeft') }
-                } else {
-                    if (vectorY > 0){ this.animate('walkDown') }
-                    else { this.animate('walkUp') }
+                    x = action[1];
+                    y = action[2];
+                    range = action[3] || 0;
+                } else if (typeof action[1] == 'object'){
+                    x = action[1].x;
+                    y = action[1].y;
+                    range = action[2]
+                     + // add the size of each Sprite to account for their bodies
+                        this.hitcircle().r +
+                        action[1].hitcircle().r;
+                    
                 }
-                // this.dx = velocityX * dt/1000;
-                // this.dy = velocityY * dt/1000;
-                this.x += velocityX * dt/1000; // this.dx;
-                this.y += velocityY * dt/1000; // this.dy;
-            } else {
-                // else, you've arrived!
-                this.stopMoving();
-                this.actionCue.shift();
-            }
-        }
-
-
-
-        updateMovement(dt){
-            if (this.movingTo){
-
-                var movingTo;
-                // if movingTo is array, they are [x, y] coords. move there
-                if ( Array.isArray(this.movingTo) ){
-                    movingTo = this.movingTo;
-                } else if (typeof this.movingTo == "object"){
-                    // else if its an object (not array) Its a Sprite. Use its x y
-                    movingTo = [this.movingTo.x, this.movingTo.y]
-                }
+                actionType = action[0];
+                console.log('doing action ', action)
                 
-                // get the x and y vectors for this player moving towards a point
-                var vectorX = movingTo[0] - this.x;
-                var vectorY = movingTo[1] - this.y - 22; // -22 so the feet land at the location, rather than the waist area
+
+                // get the x and y vectors for this player moving towards the point
+                var vectorX = x - this.x;
+                var vectorY = y - this.y;// - 22; // -22 so the feet land at the location, rather than the waist area
                 // if far from point, keep moving
-                var closeEnough = this.movementSpeed/70; // how far from point  is close enough depends on how fast you're moving
-                if (Math.sqrt( vectorX*vectorX + vectorY*vectorY ) > closeEnough){
+                range += this.movementSpeed/100; // how far from there is close enough depends on how fast you're moving
+                
+                // are we close enough to where we need to go?
+                // or do we need to walk?
+                var needToWalk = actionType != "attackInPlace" &&
+                            Math.sqrt( vectorX*vectorX + vectorY*vectorY ) > range
+                if (needToWalk){
+                    // start walking. calculate x and y of our path
                     var sideX = Math.abs(vectorX);
                     var sideY = Math.abs(vectorY);
 
@@ -215,13 +209,81 @@ var setupCharacterClass = function(camera){
                     this.y += velocityY * dt/1000; // this.dy;
                 } else {
                     // else, you've arrived!
-                    // check to see if there's more movement cued up
-                    if (this.movingToCue.length){
-                        this.movingTo = this.movingToCue.shift();
-                    } else {
-                        this.stopMoving();
+                    this.stopMoving();
+                    // do something if you were supposed to
+                    if (actionType == 'interact'){
+                        action[1].interact()
+                    } else if (actionType == 'attack' || actionType == "attackInPlace"){
+                        this.launchBasicAttack(x, y);
                     }
-                }       
+                    this.actionCue.shift();
+                }
+            }
+            return;
+            
+        }
+
+
+
+        launchBasicAttack(x, y){ // this STARTS a basic attack. At the peak of animation, launchBasicAttack
+            console.log('launchBasicAttack');
+            this.isAttacking = true
+            // console.log(this.type," is attacking ",x, y);
+            // find direction of click
+            var vectorX = x - this.x;
+            var vectorY = y - this.y;
+
+            // make sure the attack uses the correct range
+            var range = 5; // test number
+            // extend range by your size
+            range += this.hitcircle().r;
+            if (range){ // this is the range only for melee attacks. Not relevant when shooting
+                // to find the correct x and y, we need to do some math
+                // angle of the attack should == atan2(y, x)
+                var angle = Math.atan2(vectorY, vectorX) - Math.PI;
+
+                // // need the hypotenuse (distance between points) to calc our true x and y
+                // var hyp = Math.sqrt(vectorX*vectorX + vectorY*vectorY);
+                var y = (this.y+9) + range * -Math.sin(angle);
+                var x = this.x + range * -Math.cos(angle);
+            }
+
+            var sideX = Math.abs(vectorX);
+            var sideY = Math.abs(vectorY);
+
+            // store the parameters to be used when calling the basicAttack function for this launchBasicAttack call
+            this.basicAttackData = [x, y, {
+                damage: 10,
+                modifiedHitcircle: {r: 5},
+                damageType: "physical",
+                fromType: this.type // does the attack belong to the player or an enemy?
+            }];
+
+            if ( sideX > sideY ){
+                if (vectorX > 0){ this.animate('slashRight'); this.direction = 'right'; }
+                else { this.animate('slashLeft'); this.direction = 'left'; }
+            } else {
+                if (vectorY > 0){ this.animate('slashDown'); this.direction = 'down'; }
+                else { this.animate('slashUp'); this.direction = 'up'; }
+            }
+
+        }
+        basicAttack(){
+            var basicAttackData = this.basicAttackData;
+            objectsToUpdate.push(new Attack(
+                undefined, // imgName
+                basicAttackData[0], // x
+                basicAttackData[1], // y
+                basicAttackData[2], // options
+                undefined // bonusOptions
+            ));
+            console.log('basicAttack', this.direction);
+            if (this.direction == 'up'){ this.animate('slashUpFinish') }
+            else if (this.direction == 'down'){ this.animate('slashDownFinish') }
+            else if (this.direction == 'left'){ this.animate('slashLeftFinish') }
+            else if (this.direction == 'right'){ this.animate('slashRightFinish') }
+            else {
+                addError("don't know what to do with this direction: ", this.direction)
             }
         }
 
@@ -235,7 +297,8 @@ var setupCharacterClass = function(camera){
         }
 
         update(dt){
-            this.updateMovement(dt);
+            // this.updateMovement(dt);
+            this.updateActionCue(dt);
         }
     }
 

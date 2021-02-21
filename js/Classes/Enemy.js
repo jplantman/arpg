@@ -12,13 +12,8 @@ var setupEnemyClass = function(data, imgMaker){
             this.name = randy('name');
             this.isClickable = true;
             this.clickFunc = ["fight", "<b>"+this.name+":</b> Hi, I'm "+this.name];
-            
         }
-
-
     }
-
-
 
     Enemy.array = [];
 

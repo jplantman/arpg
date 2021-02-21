@@ -14,6 +14,9 @@ var setupPlayerClass = function(){
         }
 
         update(dt){
+            if (Math.random()>0.98){
+                console.log(this.currentAnimation);
+            }
 
             if (this.controls.mouseIsDown && !this.isAttacking){
                 // mouse is being clicked!
@@ -51,64 +54,53 @@ var setupPlayerClass = function(){
 
                     // we just clicked, (not hold down and move over)
                     if (this.controls.justClicked && clickingOnSomething.type == 'npc'){
-                        clickingOnSomething.onClick();
+                    // cue action to interact
+                        this.actionCue = [["interact", clickingOnSomething, 0]];
+                        // clickingOnSomething.onClick();
                     }
                     else if (clickingOnSomething.type == 'enemy'){
 
-                        // if left ckick enemy
-                        if (this.controls.mouseIsDown == 1){
-                            // move within range
-                            this.range = 10;
-                            this.movingTo = clickingOnSomething;
+                        // if left click enemy
+                        if (this.controls.mouseIsDown == 1 && !this.isAttacking){
 
-                            // then attack
-                            this.attack(clickingOnSomething);
+                            // cue up action to walk up and attack
+                            this.actionCue = [["attack", clickingOnSomething, 0]];
+                            
                         } else if (this.controls.mouseIsDown == 3){
-
+                            this.actionCue = [["attackInPlace", canvasPos.x, canvasPos.y]];
                         }
                     }
 
                     
-                    
-                    
-                    // if (this.cOnSomething.type == "npc"){
-                    //         clickingOnSomethontrols.mouseIsDown == 1){
-                    //     // left clicked on the clickable
-                    //     console.log("clickable type: ", clickingOnSomething.type);
-                    //     if (clickinging.onClick();
-                    //     }
-                        
-                    // } else if (this.controls.mouseIsDown == 3){
-                    //     // right clicked on the clickable
-                    //     // clickingOnSomething.markedForDeath = true;
-
-                    // }
                 } 
                 // IF NOT CLICKING ON SOMETHING //
                 else if (this.controls.mouseIsDown == 1){
                     // left click on ground, move there
-                    this.movingTo = [ canvasPos.x, canvasPos.y ];
-                    this.movingToCue = [];
+                    // this.movingTo = [ canvasPos.x, canvasPos.y ];
+                    // this.movingToCue = [];
+                    this.actionCue = [["move", canvasPos.x, canvasPos.y]];
                 }
                 else if (this.controls.mouseIsDown == 3){
-                    // right click on ground, attack
-                    this.stopMoving();
-                    this.isAttacking = true;
-                    var mousePos = this.controls.mousePosition;
-                    // find direction of click
-                    var vectorX = (mousePos[0]+ this.camera.x - this.camera.width/2) - this.x;
-                    var vectorY = (mousePos[1]+ this.camera.y - this.camera.height/2) - this.y
+                    this.actionCue = [["attackInPlace", canvasPos.x, canvasPos.y]];
+                    
+                    // // right click on ground, attack ground
+                    // this.stopMoving();
+                    // this.isAttacking = true;
+                    // var mousePos = this.controls.mousePosition;
+                    // // find direction of click
+                    // var vectorX = (mousePos[0]+ this.camera.x - this.camera.width/2) - this.x;
+                    // var vectorY = (mousePos[1]+ this.camera.y - this.camera.height/2) - this.y
 
-                    var sideX = Math.abs(vectorX);
-                    var sideY = Math.abs(vectorY);
+                    // var sideX = Math.abs(vectorX);
+                    // var sideY = Math.abs(vectorY);
 
-                    if ( sideX > sideY ){
-                        if (vectorX > 0){ this.animate('slashRight'); this.direction = 'right'; }
-                        else { this.animate('slashLeft'); this.direction = 'left'; }
-                    } else {
-                        if (vectorY > 0){ this.animate('slashDown'); this.direction = 'down'; }
-                        else { this.animate('slashUp'); this.direction = 'up'; }
-                    }
+                    // if ( sideX > sideY ){
+                    //     if (vectorX > 0){ this.animate('slashRight'); this.direction = 'right'; }
+                    //     else { this.animate('slashLeft'); this.direction = 'left'; }
+                    // } else {
+                    //     if (vectorY > 0){ this.animate('slashDown'); this.direction = 'down'; }
+                    //     else { this.animate('slashUp'); this.direction = 'up'; }
+                    // }
                 }
             }
 
@@ -123,13 +115,6 @@ var setupPlayerClass = function(){
             this.controls.justClicked = false;
         }
 
-        attackDirection(){
-
-        }
-
-        attack(enemy){
-            console.log(this, " attacks ", enemy);    
-        }
 
     }
     

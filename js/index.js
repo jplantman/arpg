@@ -30,6 +30,7 @@ const create = function(data) // data contains an obj with all the data from the
     // create sprite classes and animations //
     // all setupXClass functions return the class object
     Sprite = setupSpriteClass(data, camera);
+    Attack = setupAttackClass(data);
     Character = setupCharacterClass(camera);
     Player = setupPlayerClass(data);
     NPC = setupNPCClass(data, imgMaker);
@@ -65,21 +66,35 @@ const create = function(data) // data contains an obj with all the data from the
     enableCollisions(player, {
         target: world.collideableSceneryCircles,
         type: 'circlevscircles',
-        resolution: true
+        options: {
+            resolution: true,
+            killOnContact: false
+        }
     });
 
     enableCollisions(player, {
         target: world.collideableSceneryRectangles,
         type: 'circlevsrectangles',
-        resolution: true,
+        options: {
+            resolution: true,
+            killOnContact: false
+        },
     });
 
     enableCollisions(player, {
         target: Enemy.array,
         type: 'circlevsrectangles',
-        resolution: true,
+        options: {
+            resolution: true,
+            killOnContact: false
+        },
     });
 
+
+
+
+
+  
 
 
     
