@@ -11,6 +11,7 @@ function enableCollisions(sprite, collisionData){
             element.collisionData = element.collisionData || [];
             element.collisionData.push( collisionData );
         }
+        // if its
     } else {
         sprite.collisionData = sprite.collisionData || [];
         sprite.collisionData.push( collisionData );
@@ -24,7 +25,7 @@ function enableCollisions(sprite, collisionData){
 // use this collision check every time. This will handle all the hitbox business and the resolution, keeping that logic out of the collision functions themselves
 // checks what shape thing is and makes the right collision check
 function collisionCheck(shape, element, options={}, callback){
-    var result = {}; // this data is returned if there is a collision
+    var result;; // this data is returned if there is a collision
 
     if (shape.bodyShape == 'circle'){
         // if the shape is a circle, run it against the right shape from the array
@@ -46,7 +47,7 @@ function collisionCheck(shape, element, options={}, callback){
                 littleHitcircle = shapeHitbox;
             }
 
-            var result = circlesvscirclesCollision(bigHitcircle, littleHitcircle, options.resolution, callback);
+            result = circlesvscirclesCollision(bigHitcircle, littleHitcircle, options.resolution, callback);
             if (result){
                 if (options.resolution){
                     little.x += result[0]/8;
@@ -63,7 +64,7 @@ function collisionCheck(shape, element, options={}, callback){
             // circle vs rectangle
             var hitcircle = shape.hitcircle();
             var hitbox = element.hitbox();
-            var result = circlevsrectangleCollision(hitcircle, hitbox, options.resolution, callback);
+            result = circlevsrectangleCollision(hitcircle, hitbox, options.resolution, callback);
             if (result){
                 if (options.resolution){
                 // this simple resolution just moves the guy back by as much as the sides calculated above.
@@ -99,12 +100,13 @@ function collisionCheck(shape, element, options={}, callback){
         // If first shape is a rectangle
         if (element.bodyShape == 'rectangle'){
             // rect vs rect
-            return rectangevsrectangleCollision(shape, element);
+            result =  rectangevsrectangleCollision(shape, element);
 
         } else if (element.bodyShape == 'circle'){
             // might not need this for a while
         }
     }
+    return result;
 }
 
 // checks what shape thing is and makes the right collision check vs array
@@ -205,7 +207,7 @@ var rectanglevscircleCollision = function(rectangle, circle, resolution, callbac
     return circlevsrectangleCollision(circle, rectangle, resolution, callback);
 }
 
-var rectangevsrectangleCollision = function(rect1, rect2, resolution, callback){
+var rectangevsrectangleCollision = function(rect1, rect2){
     return  rect1.x + rect1.w > rect2.x && rect1.x < rect2.x+rect2.w &&
     rect1.y + rect1.w > rect2.y && rect1.y < rect2.y+rect2.h
 }

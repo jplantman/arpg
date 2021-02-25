@@ -19,6 +19,13 @@ var setupSpriteClass = function(data, camera){
                 this.frameHeight = this.imgData[2];
                 this.frame = [0, 0];
             }
+
+            this.fadeStart; // help manage fadeEffect
+            this.fadeDuration;
+
+            // if we need to change the width and height of the img as it appears on the screen
+            this.modW = options.modW;
+            this.modH = options.modH;
             
             
             
@@ -29,14 +36,14 @@ var setupSpriteClass = function(data, camera){
             // can pass custom hitbox, else default hitbox will == sprite's dimensions
             // resolutionWeight: the higher it is, the more priority for staying still in a collision resolution
             // if Sprite is a rectange, options.modifiedHitcircle is expected to be an empty object {}, with a option.modifiedHitbox passed as well
-            this.hitcircleData = options.modifiedHitcircle || {r: this.frameWidth/2, dx:0, dy:0, resolutionWeight: 100}
+            this.hitcircleData = options.modifiedHitcircle || {r: this.modW/2 || this.frameWidth/2, dx:0, dy:0, resolutionWeight: 100}
 
             // here we check for hitbox data, in case of rectangular Sprites
             if (options.modifiedHitbox){
                 this.hitcircleData = undefined;
                 this.hitboxData = options.modifiedHitbox;
                 this.bodyShape = 'rect'; // helps w collisions
-            }else {
+            } else {
                 this.bodyShape = 'circle';
             }
         }
@@ -59,7 +66,7 @@ var setupSpriteClass = function(data, camera){
 
         draw(){
             // Debugging Hitboxes //
-            var debugging = true; // shows collision bodies
+            var debugging = false; // shows collision bodies
             if (debugging){
                 if (this.hitcircleData){
                     var hitcircle = this.hitcircle();
@@ -86,8 +93,21 @@ var setupSpriteClass = function(data, camera){
             // draw nothing if this is invisible
             if (!this.imgData){ return }
 
+            // handle fade
+            ctx.globalAlpha = 1;
+            if (this.fadeStart){ // if there's fade data
+                // check to see how much fade time is elapsed
+                var elapsed = Date.now()-this.fadeStart;
+                if (elapsed < 1000){
+                    ctx.globalAlpha = 0.3+Math.sin( elapsed/500 )/2
+                } else {
+                    this.fadeStart = undefined;
+                    this.fadeDuration = undefined;
+                }
+            }
+
             if (this.currentAnimation){
-                console.log(this.currentAnimation)
+                // if (this.type == 'enemy'){ console.log(this.currentAnimation) }
                 
                 // fetch the current animation's data
                 var animData = this.animations[this.currentAnimation]
@@ -97,7 +117,7 @@ var setupSpriteClass = function(data, camera){
                     // progress the animation index by 1
                     this.animationIndex+= 1
                     // check to see if we're at the end of the animation
-                    if (this.animationIndex+1 >= animData.framesArray.length){
+                    if (this.animationIndex+1 > animData.framesArray.length){
                         // should the animation only run once?
                         if (animData.onlyOnce){
                             this.currentAnimation = undefined;
@@ -105,6 +125,8 @@ var setupSpriteClass = function(data, camera){
                         // if we are, handle the potential callback
                         if (animData.callback){
                             animData.callback();
+                            // in case there's a new animation... 
+                            animData = this.animations[this.currentAnimation];
                         }
                     }
                     // if we still have an animation going after the callback, continue/loop the animation
@@ -127,9 +149,9 @@ var setupSpriteClass = function(data, camera){
             ctx.drawImage(
                 this.imgObj,
                 this.frame[0]*this.frameWidth, this.frame[1]*this.frameHeight, this.frameWidth, this.frameHeight,
-                this.x - this.frameWidth/2 - camera.x+camera.width/2, 
-                this.y - this.frameHeight/2 - camera.y+camera.height/2, 
-                this.frameWidth, this.frameHeight
+                this.x - (this.modW || this.frameWidth)/2 - camera.x+camera.width/2, 
+                this.y - (this.modH || this.frameHeight)/2 - camera.y+camera.height/2, 
+                this.modW || this.frameWidth, this.modH || this.frameHeight
             )
 
             // // Debugging Hitboxes //
@@ -158,20 +180,22 @@ var setupSpriteClass = function(data, camera){
             //     }                
             // }
         }
+        fadeEffect(duration){
+            this.fadeStart = Date.now();
+            this.fadeDuration = duration;
+        }
+
     }
 
     // stop animation
     Sprite.prototype.stopAnimation = function(){
-        console.log('stopped animation')
         this.currentAnimation = undefined;
         this.animationIndex = 0;
         this.frameCount = 0;
     }
 
     Sprite.prototype.animate = function(animName){
-        console.log('animation was previously ', this.currentAnimation);
         this.currentAnimation = animName;
-        console.log('called to animate ', this.currentAnimation)
     }
 
     // sprite.currentAnimation = "animationName"; to animate
@@ -188,8 +212,6 @@ var setupSpriteClass = function(data, camera){
         };
         sprite.frameCount = sprite.frameCount || 0;
         sprite.animationIndex = 0;
-
-        
     }
 
     // Tiled sends us custom properties in a weird ass format. We fix it and put them all the way we like

@@ -4,15 +4,6 @@
   create (in this file, index.html)
   loop.js
 
-
-  **** Family Tree ****
-
-        Sprite
-          v
-      Character   
-          v
-        Player
-
 */
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -30,6 +21,7 @@ const create = function(data) // data contains an obj with all the data from the
     // create sprite classes and animations //
     // all setupXClass functions return the class object
     Sprite = setupSpriteClass(data, camera);
+    Item = setupItemClass(data);
     Attack = setupAttackClass(data);
     Character = setupCharacterClass(camera);
     Player = setupPlayerClass(data);
@@ -44,6 +36,7 @@ const create = function(data) // data contains an obj with all the data from the
     objectsToUpdate.push(world);
     world.processObjectsFromTiledData(Sprite);
     
+    setupUI(world);
 
     // controls //
     const controls = initPlayerControls();
@@ -56,8 +49,10 @@ const create = function(data) // data contains an obj with all the data from the
     // Player //
     const player = new Player("male-light", world.playerStart[0], world.playerStart[1], controls, camera);
     objectsToUpdate.push(player);
+    world.player = player;
+    setupItemsManager(player, world);
     
-    player.imgObj = imgMaker(["male-light","shirt-brown-longsleeve" , "leather-chest-male", "teal-pants-male", "dagger-male"]);
+    player.imgObj = imgMaker(["male-light","shirt-brown-longsleeve" , "teal-pants-male"]);
     camera.following = player;
     camera.world = world;
     objectsToUpdate.push(camera)

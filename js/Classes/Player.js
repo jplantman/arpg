@@ -3,20 +3,32 @@ var setupPlayerClass = function(){
         constructor(imgData, x, y, controls, camera){
             super (imgData, x, y);
 
+            this.name = randy("name");
             this.type = "player";
             this.collisionCounter = 0;
+
+            this.strength = 20;
+            this.skill = 20;
+            this.toughness = 20;
+            this.magicka = 20;
             
             this.controls = controls;
             this.camera = camera;
             this.movementSpeed = 200;
             
-            
+            // enable collision with enemy's attacks
+            enableCollisions(this, {
+                target: Attack.enemyAttacks,
+                type: 'circlevscircles',
+                options: {
+                    resolution: false,
+                    killOnContact: true
+                },
+                callback: this.takeAttack.bind(this)
+            });
         }
 
         update(dt){
-            if (Math.random()>0.98){
-                console.log(this.currentAnimation);
-            }
 
             if (this.controls.mouseIsDown && !this.isAttacking){
                 // mouse is being clicked!
@@ -30,7 +42,8 @@ var setupPlayerClass = function(){
                     x: this.controls.mousePosition[0] + this.camera.x - this.camera.width/2,
                     y: this.controls.mousePosition[1] + this.camera.y - this.camera.height/2
                 }
-                
+                // first check if an item is being selected. If so, all you gotta do is drop that item
+
                 var clickingOnSomething;
                 // Are you clicking on something? //
                 for (let i = 0; i < objectsToUpdate.length; i++) {
@@ -51,9 +64,9 @@ var setupPlayerClass = function(){
                 
                 // IF CLICKING ON SOMETHING //
                 if (clickingOnSomething){
-
                     // we just clicked, (not hold down and move over)
-                    if (this.controls.justClicked && clickingOnSomething.type == 'npc'){
+                    if (this.controls.justClicked && 
+                        (clickingOnSomething.type == 'npc' || clickingOnSomething.type == 'item')){
                     // cue action to interact
                         this.actionCue = [["interact", clickingOnSomething, 0]];
                         // clickingOnSomething.onClick();
@@ -75,10 +88,15 @@ var setupPlayerClass = function(){
                 } 
                 // IF NOT CLICKING ON SOMETHING //
                 else if (this.controls.mouseIsDown == 1){
-                    // left click on ground, move there
-                    // this.movingTo = [ canvasPos.x, canvasPos.y ];
-                    // this.movingToCue = [];
-                    this.actionCue = [["move", canvasPos.x, canvasPos.y]];
+                    // if selecting an item, drop it there. else, regular move
+                    if (world.player.itemSelected){
+                        this.actionCue = [["dropSelectedItem", canvasPos.x, canvasPos.y]];
+                    } else {
+                        // left click on ground, move there
+                        // this.movingTo = [ canvasPos.x, canvasPos.y ];
+                        // this.movingToCue = [];
+                        this.actionCue = [["move", canvasPos.x, canvasPos.y]];
+                    }
                 }
                 else if (this.controls.mouseIsDown == 3){
                     this.actionCue = [["attackInPlace", canvasPos.x, canvasPos.y]];
@@ -102,6 +120,8 @@ var setupPlayerClass = function(){
                     //     else { this.animate('slashUp'); this.direction = 'up'; }
                     // }
                 }
+                
+                
             }
 
             // add move command to the movement cue
@@ -113,6 +133,17 @@ var setupPlayerClass = function(){
 
             // if you just clicked, that click happened by now
             this.controls.justClicked = false;
+        }
+
+        takeAttack(attack){
+            super.takeAttack(attack);
+            world.ui.healthBar.update(this);
+            console.log('took attack ', attack)
+        }
+
+        gainItem(item){
+            world.addToInventory(this, item);
+            world.ui.updateItemsMenu();
         }
 
 

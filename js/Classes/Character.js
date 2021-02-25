@@ -10,6 +10,10 @@ var setupCharacterClass = function(camera){
 
             super (imgData, x, y, options );
 
+
+            this.health = 100;
+            this.healthMax = this.health;
+
             // to access this from inside a callback function
             var that = this;
 
@@ -48,7 +52,6 @@ var setupCharacterClass = function(camera){
 
                 
             this.finishedAttacking = function(){
-                console.log('finishedAttacking');
                 that.isAttacking = false;
                 // stand normally facing the direction you were just attacking
                 switch(that.direction){
@@ -152,6 +155,8 @@ var setupCharacterClass = function(camera){
             // ["move", x, y] or ["attack", {Enemy}, range] or ["interact", {Chest}, range]
             // this function will make a Character walk up to something/somewhere and do some action there
             
+            
+
             var action = this.actionCue[0];
             
             // if there's an action...
@@ -173,8 +178,6 @@ var setupCharacterClass = function(camera){
                     
                 }
                 actionType = action[0];
-                console.log('doing action ', action)
-                
 
                 // get the x and y vectors for this player moving towards the point
                 var vectorX = x - this.x;
@@ -212,9 +215,12 @@ var setupCharacterClass = function(camera){
                     this.stopMoving();
                     // do something if you were supposed to
                     if (actionType == 'interact'){
-                        action[1].interact()
+                        action[1].interact(this)
                     } else if (actionType == 'attack' || actionType == "attackInPlace"){
                         this.launchBasicAttack(x, y);
+                    } else if (actionType == 'dropSelectedItem'){
+                        // this really can only be done by the player
+                        world.ui.dropSelectedItem();
                     }
                     this.actionCue.shift();
                 }
@@ -226,8 +232,8 @@ var setupCharacterClass = function(camera){
 
 
         launchBasicAttack(x, y){ // this STARTS a basic attack. At the peak of animation, launchBasicAttack
-            console.log('launchBasicAttack');
-            this.isAttacking = true
+            this.isAttacking = true;
+
             // console.log(this.type," is attacking ",x, y);
             // find direction of click
             var vectorX = x - this.x;
@@ -247,7 +253,7 @@ var setupCharacterClass = function(camera){
                 var y = (this.y+9) + range * -Math.sin(angle);
                 var x = this.x + range * -Math.cos(angle);
             }
-
+            
             var sideX = Math.abs(vectorX);
             var sideY = Math.abs(vectorY);
 
@@ -277,7 +283,8 @@ var setupCharacterClass = function(camera){
                 basicAttackData[2], // options
                 undefined // bonusOptions
             ));
-            console.log('basicAttack', this.direction);
+            // this.stopAnimation();
+            this.animationIndex = 0;
             if (this.direction == 'up'){ this.animate('slashUpFinish') }
             else if (this.direction == 'down'){ this.animate('slashDownFinish') }
             else if (this.direction == 'left'){ this.animate('slashLeftFinish') }
@@ -285,6 +292,14 @@ var setupCharacterClass = function(camera){
             else {
                 addError("don't know what to do with this direction: ", this.direction)
             }
+        }
+        
+        takeAttack(attack){
+            this.health -= attack.options.damage;
+            if (this.health <= 0){
+                this.markedForDeath = true;
+            }
+            this.fadeEffect();
         }
 
         // calculate distance from this char to target

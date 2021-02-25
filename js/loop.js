@@ -48,25 +48,34 @@ function updateAndDrawEverything(dt){
             // loop through the array of collisionDatas
             for (let n = 0; n < element.collisionData.length; n++) {
                 const thisCollisionData = element.collisionData[n];
-                // console.log(thisCollisionData)
                 for (let k = 0; k < thisCollisionData.target.length; k++) {
-                    const target = thisCollisionData.target[k];
-                    var collided = collisionCheck(element, target, thisCollisionData.options, thisCollisionData.callback);
+                    const thisTarget = thisCollisionData.target[k];
+                    // console.log(thisTarget)
+                    var collisionResult = collisionCheck(element, thisTarget, thisCollisionData.options, thisCollisionData.callback);
+                    // if (target.type == 'enemy'){
+                    //     // console.log(thisCollisionData.options)
+                    // }
                     
                     // if there was a collision, and killoncontact is on, kill it
-                    // if (collided && thisCollisionData.options.killOnContact){ 
-                    //     thisCollisionData.target.splice(k, 1);
-                    //     k--;
-                    //     element.markedForDeath = true;
+                    if (collisionResult){ 
+                        // console.log('collided ', thisCollisionData.options, thisTarget.type)
+                        if (thisCollisionData.options.killOnContact){
+                            // console.log("killing on contact: ")
+                            thisCollisionData.target.splice(k, 1);
+                            k--;
+                            thisTarget.markedForDeath = true;
+                        }
+                        // console.log("=================")
+                        
 
-                    // }
+                    }
                 }
             }
+            // console.log(0.5+Math.sin( Date.now()/1000 )/2)
         }  
 
         // remove Sprites that died
         if ( element.markedForDeath ){
-            console.log(element)
             // check which array the object belonged to, and remove it from that source array
             if (i < objectsToUpdate.length){
                 objectsToUpdate.splice(i, 1);

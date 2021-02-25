@@ -69,6 +69,8 @@ var images;
         // "water": ["imgs/tilesets/water.png", 32, 32],
         // "watergrass": ["imgs/tilesets/watergrass.png", 32, 32],
         
+        "sword1": ["imgs/items/sword1.png", 247, 265],
+        "staff1": ["imgs/items/staff1.png", 383, 370],
 
     };
     var imagesPreloadedCount = 0;

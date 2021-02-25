@@ -12,13 +12,11 @@ var setupNPCClass = function(data, imgMaker){
             this.name = randy('name');
             this.isClickable = true;
             this.clickFunc = ["say", "<b>"+this.name+":</b> Hi, I'm "+this.name];
-            
         }
         
         interact = function(){
             if (this.clickFunc[0] == 'say'){
-                say(this.clickFunc[1]);
-                
+                world.ui.say(this.clickFunc[1]);
             }
         }
     }
@@ -27,7 +25,6 @@ var setupNPCClass = function(data, imgMaker){
 
     NPC.generateFromTiledData = function(object){
         object = Sprite.extractTiledObjectProperties(object);
-        console.log(object);
         var npc = new NPC(object.spritesheetName, object.x, object.y, object);
         NPC.array.push(npc);
         objectsToUpdate.push(npc);
